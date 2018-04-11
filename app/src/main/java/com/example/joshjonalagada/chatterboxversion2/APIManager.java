@@ -1,17 +1,20 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 // this is implemented
 interface ResponseListener {
@@ -27,72 +30,59 @@ public class APIManager {
 
     private static final String prefixURL = "http://shoemate.net:8888/";
 
-    private RequestQueue requestQueue;
-
-    private APIManager(Context context) {
-        requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-    }
-
-    public static synchronized APIManager getInstance(Context context) {
-        if (null == instance)
-            instance = new APIManager(context);
-        return instance;
-    }
-
-    //this is so you don't need to pass context each time
     public static synchronized APIManager getInstance() {
-
-        // must initialize with context on first time-- Context context = this;
-        if (null == instance) {
-            throw new IllegalStateException(APIManager.class.getSimpleName() +
-                    " is not initialized, call getInstance(Context myContext) first");
-        }
+        if (null == instance)
+            instance = new APIManager();
         return instance;
     }
 
-    private void sendPOST(String endpoint, JSONObject jsonParams, final ResponseListener listener) {
+    private void sendPOST(String endpoint, RequestBody body, final ResponseListener listener) {
 
-        String url = prefixURL + endpoint;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonParams,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, "GOT RESPONSE");
-                        Log.d(TAG + " : ", "sendPOST Response : " + response.toString());
-                        if (null != response.toString()) listener.getResult(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (null != error.networkResponse) {
-                            Log.d(TAG + " : ", "Error Response code: " + error.networkResponse.statusCode);
-                        }
-                    }
-                });
+        OkHttpClient client = new OkHttpClient();
 
-        requestQueue.add(request);
+        Request request = new Request.Builder()
+                .url("http://shoemate.net:8888/" + endpoint)
+                .header("Accept-Encoding", "identity")
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                final String responseData = response.body().string();
+                try {
+                    listener.getResult((JSONObject) new JSONParser().parse(responseData));
+                } catch (ParseException e) {
+                    Log.e(TAG, "Could not parse: " + responseData);
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, final IOException exc) {
+                // TODO java.net.ProtocolException: unexpected end of stream
+                // This error occurs randomly, still need to look into. Doesn't seem to be happening now?
+                Log.e(TAG, String.valueOf(exc));
+            }
+        });
     }
-
 
     public void loginUser(String userID, final String password) {
 
         class LoginListener implements ResponseListener {
             public void getResult(JSONObject response) {
-                Log.d(TAG + " : ", "In login callback");
-                Log.d(TAG + " : ", String.valueOf(response));
+                Log.d(TAG, "In login callback");
+                Log.d(TAG, String.valueOf(response));
             }
         }
 
-        Log.d(TAG, "In loginUser function");
-        JSONObject POST = new JSONObject();
-        try {
-            POST.put("api_key", APIManager.api_key);
-            POST.put("username", userID);
-            POST.put("password", password);
-            this.sendPOST("login", POST, new LoginListener());
-        } catch (JSONException e) {
-            Log.d(TAG + " : ", String.valueOf(e));
-        }
+        Log.d(TAG, "In loginUser function.");
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("username", userID)
+                .add("password", password)
+                .add("api_key", api_key)
+                .build();
+
+        this.sendPOST("login", formBody, new LoginListener());
     }
 }

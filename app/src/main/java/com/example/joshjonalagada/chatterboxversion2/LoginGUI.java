@@ -37,7 +37,7 @@ public class LoginGUI extends AppCompatActivity { //this name may need to change
     }
     public void validateUser()
     {
-        APIManager.getInstance(this).loginUser("test_user", "test_password");
+        APIManager.getInstance().loginUser("test_user", "test_password");
         
         openChatList();
     }
