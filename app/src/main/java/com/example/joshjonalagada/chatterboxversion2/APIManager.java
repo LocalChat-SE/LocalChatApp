@@ -1,5 +1,9 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
+/**
+ * Created by Michael Shoemate on 4/10/2018.
+ */
+
 import android.content.Context;
 import android.util.Log;
 

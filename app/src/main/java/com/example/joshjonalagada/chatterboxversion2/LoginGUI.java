@@ -1,5 +1,6 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,7 +22,7 @@ public class LoginGUI extends AppCompatActivity { //this name may need to change
                 validateUser();
             }
         });
-        Button registerButton = findViewById(R.id.registerButton); //getting the register button for he event handler
+        Button registerButton = findViewById(R.id.registerButton); //getting the register button for the event handler
         registerButton.setOnClickListener(new View.OnClickListener() { //this is the onClick listener for submit, it will validate the user
 
             @Override
@@ -41,9 +42,8 @@ public class LoginGUI extends AppCompatActivity { //this name may need to change
         
         openChatList();
     }
-    public void openChatList()
-    {
-        setContentView(R.layout.activity_chat_list_gui);
+    public void openChatList(){
+        startActivity(new Intent(LoginGUI.this, ChatListController.class));
     }
 
 }

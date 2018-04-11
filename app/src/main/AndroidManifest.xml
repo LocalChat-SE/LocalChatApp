@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ChatListController"></activity>
+        <activity android:name=".ChatRoomController"></activity>
     </application>
 
 </manifest>

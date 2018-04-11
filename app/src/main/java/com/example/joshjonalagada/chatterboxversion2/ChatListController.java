@@ -1,5 +1,6 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,12 +17,13 @@ public class ChatListController extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                logOut();
+                startActivity(new Intent(ChatListController.this, LoginGUI.class));
             }
         });
     }
-    public void logOut()
-    {
-        setContentView(R.layout.activity_login_gui);
+    public void openChat(Chat c){
+        Intent i = new Intent(ChatListController.this, ChatRoomController.class);
+        i.putExtra("Chat", c);
+        startActivity(i);
     }
 }
