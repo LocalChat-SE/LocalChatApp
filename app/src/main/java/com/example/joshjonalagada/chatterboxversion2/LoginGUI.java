@@ -3,8 +3,11 @@ package com.example.joshjonalagada.chatterboxversion2;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import org.json.simple.JSONObject;
 
 public class LoginGUI extends AppCompatActivity { //this name may need to change to LoginController
 
@@ -38,9 +41,17 @@ public class LoginGUI extends AppCompatActivity { //this name may need to change
     }
     public void validateUser()
     {
-        APIManager.getInstance().loginUser("test_user", "test_password");
-        
-        openChatList();
+        // callback for processing the response from the API
+        class LoginListener implements ResponseListener {
+            public void getResult(JSONObject response) {
+                Log.d("LoginController", "In login callback");
+                Log.d("LoginController", String.valueOf(response));
+
+                openChatList();
+            }
+        }
+
+        APIManager.getInstance().loginUser(new LoginListener(),"test_user", "test_password");
     }
     public void openChatList(){
         startActivity(new Intent(LoginGUI.this, ChatListController.class));

@@ -66,14 +66,7 @@ public class APIManager {
         });
     }
 
-    public void loginUser(String userID, final String password) {
-
-        class LoginListener implements ResponseListener {
-            public void getResult(JSONObject response) {
-                Log.d(TAG, "In login callback");
-                Log.d(TAG, String.valueOf(response));
-            }
-        }
+    public void loginUser(ResponseListener listener, String userID, final String password) {
 
         Log.d(TAG, "In loginUser function.");
 
@@ -83,6 +76,6 @@ public class APIManager {
                 .add("api_key", api_key)
                 .build();
 
-        this.sendPOST("login", formBody, new LoginListener());
+        this.sendPOST("login", formBody, listener);
     }
 }
