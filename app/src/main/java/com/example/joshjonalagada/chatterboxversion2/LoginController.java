@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class LoginGUI extends AppCompatActivity { //this name may need to change to LoginController
+public class LoginController extends AppCompatActivity { //this name may need to change to LoginController
 
     User loggedInUser;
     @Override
@@ -50,7 +50,7 @@ public class LoginGUI extends AppCompatActivity { //this name may need to change
 //            Remember that the chats are initially created without data-- the data is loaded in when you open the chat
 //            new Chat(json.get("data"));
         } catch (ParseException e) {
-            Log.d("LoginGUI", "Could not parse!");
+            Log.d("LoginController", "Could not parse!");
         }
     }
 
@@ -69,7 +69,7 @@ public class LoginGUI extends AppCompatActivity { //this name may need to change
         APIManager.getInstance().getUser(new LoginListener(),"test_user", "test_password");
     }
     public void openChatList(){
-        startActivity(new Intent(LoginGUI.this, ChatListController.class));
+        startActivity(new Intent(LoginController.this, ChatListController.class));
     }
 
 }

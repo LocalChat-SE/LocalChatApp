@@ -17,7 +17,7 @@ public class ChatListController extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ChatListController.this, LoginGUI.class));
+                startActivity(new Intent(ChatListController.this, LoginController.class));
             }
         });
     }
