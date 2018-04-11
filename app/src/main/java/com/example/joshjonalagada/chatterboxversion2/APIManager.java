@@ -66,10 +66,7 @@ public class APIManager {
         });
     }
 
-    public void loginUser(ResponseListener listener, String userID, final String password) {
-
-        Log.d(TAG, "In loginUser function.");
-
+    public void getUser(ResponseListener listener, String userID, String password) {
         RequestBody formBody = new FormBody.Builder()
                 .add("username", userID)
                 .add("password", password)
@@ -77,5 +74,80 @@ public class APIManager {
                 .build();
 
         this.sendPOST("login", formBody, listener);
+    }
+
+
+
+    public void setUser(ResponseListener listener, String userID, String password) {
+        RequestBody formBody = new FormBody.Builder()
+                .add("username", userID)
+                .add("password", password)
+                .add("api_key", api_key)
+                .build();
+
+        this.sendPOST("new_user", formBody, listener);
+    }
+
+    public void getChats(ResponseListener listener, float lat, float lon) {
+        RequestBody formBody = new FormBody.Builder()
+                .add("location", "Point(" +
+                        String.valueOf(lat) + " " +
+                        String.valueOf(lon) + ")")
+                .add("api_key", api_key)
+                .build();
+
+        this.sendPOST("get_nearby_chats", formBody, listener);
+    }
+
+    public void getChat(ResponseListener listener, String chatID) {
+        RequestBody formBody = new FormBody.Builder()
+                .add("chatID", chatID)
+                .add("limit", "100")
+                .add("offset", "0")
+                .add("api_key", api_key)
+                .build();
+
+        this.sendPOST("get_chat", formBody, listener);
+    }
+
+    public void setChat(ResponseListener listener, String chatID) {
+        //TODO not implemented
+    }
+
+    public void sendMessage(ResponseListener listener, String chatID, String message) {
+        RequestBody formBody = new FormBody.Builder()
+                .add("chat_id", chatID)
+                .add("value", message)
+                .add("api_key", api_key)
+                .build();
+
+        this.sendPOST("new_message", formBody, listener);
+    }
+
+    public void setEnrollment(ResponseListener listener, String chatID, String userID, String action) {
+        RequestBody formBody;
+        if (action.equals("moderator")) {
+            formBody = new FormBody.Builder()
+                    .add("chat_id", chatID)
+                    .add("user_id", userID)
+                    .add("api_key", api_key)
+                    .build();
+        }
+        else if (action.equals("ban")) {
+            formBody = new FormBody.Builder()
+                    .add("chat_id", chatID)
+                    .add("user_id", userID)
+                    .add("api_key", api_key)
+                    .build();
+        }
+        else if (action.equals("unban")) {
+            formBody = new FormBody.Builder()
+                    .add("chat_id", chatID)
+                    .add("user_id", userID)
+                    .add("api_key", api_key)
+                    .build();
+        } else return;
+
+        this.sendPOST("set_enrollment", formBody, listener);
     }
 }
