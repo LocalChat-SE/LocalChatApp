@@ -76,6 +76,14 @@ public class APIManager {
         this.sendPOST("login", formBody, listener);
     }
 
+    // right now this just deletes the cookie
+    public void logout(ResponseListener listener) {
+        RequestBody formBody = new FormBody.Builder()
+                .add("api_key", api_key)
+                .build();
+        this.sendPOST("logout", formBody, listener);
+    }
+
     public void setUser(ResponseListener listener, String userID, String password) {
         RequestBody formBody = new FormBody.Builder()
                 .add("username", userID)

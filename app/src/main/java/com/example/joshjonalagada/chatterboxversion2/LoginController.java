@@ -3,20 +3,14 @@ package com.example.joshjonalagada.chatterboxversion2;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.BoringLayout;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class LoginController extends AppCompatActivity { //this name may need to change to LoginController
-
-    User loggedInUser;
 
     EditText usernameField;
     EditText passwordField;

@@ -3,8 +3,11 @@ package com.example.joshjonalagada.chatterboxversion2;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import org.json.simple.JSONObject;
 
 public class ChatListController extends AppCompatActivity {
 
@@ -17,10 +20,22 @@ public class ChatListController extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ChatListController.this, LoginController.class));
+                logoutUser();
             }
         });
     }
+
+    public void logoutUser() {
+        class LogoutListener implements ResponseListener {
+            public void getResult(final JSONObject response) {
+                if ((Boolean) response.get("status")) return;
+                Log.d("ChatListController", "Error logging out. Continuing regardless.");
+            }
+        }
+        APIManager.getInstance().logout(new LogoutListener());
+        startActivity(new Intent(ChatListController.this, LoginController.class));
+    }
+
     public void openChat(Chat c){
         Intent i = new Intent(ChatListController.this, ChatRoomController.class);
         i.putExtra("Chat", c);
