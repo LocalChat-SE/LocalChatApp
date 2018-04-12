@@ -9,14 +9,14 @@
     <RelativeLayout
         android:layout_width="395dp"
         android:layout_height="587dp"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <EditText
-            android:id="@+id/editText5"
+            android:id="@+id/passwordField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/editText4"
+            android:layout_below="@+id/usernameField"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="40dp"
             android:ems="10"
@@ -24,11 +24,11 @@
             android:text="Password" />
 
         <EditText
-            android:id="@+id/editText4"
+            android:id="@+id/usernameField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/editText5"
+            android:layout_alignStart="@+id/passwordField"
             android:layout_marginTop="204dp"
             android:ems="10"
             android:inputType="textPersonName"
@@ -40,8 +40,8 @@
             android:id="@+id/submitButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/editText5"
-            android:layout_below="@+id/editText5"
+            android:layout_alignEnd="@+id/passwordField"
+            android:layout_below="@+id/passwordField"
             android:layout_marginTop="110dp"
             android:text="Submit" />
 
@@ -50,8 +50,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/submitButton"
-            android:layout_alignStart="@+id/editText5"
+            android:layout_alignStart="@+id/passwordField"
             android:text="Register" />
+
+        <TextView
+            android:id="@+id/credentialsPrompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/passwordField"
+            android:layout_alignStart="@+id/passwordField"
+            android:layout_below="@+id/passwordField" />
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

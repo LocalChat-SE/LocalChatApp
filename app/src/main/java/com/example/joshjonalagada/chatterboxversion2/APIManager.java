@@ -16,7 +16,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-// this is implemented
+// this is implemented where the call an APIManager method is made. getResult is passed the json response.
 interface ResponseListener {
     void getResult(JSONObject response);
 }
@@ -75,8 +75,6 @@ public class APIManager {
 
         this.sendPOST("login", formBody, listener);
     }
-
-
 
     public void setUser(ResponseListener listener, String userID, String password) {
         RequestBody formBody = new FormBody.Builder()
