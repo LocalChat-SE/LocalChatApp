@@ -23,6 +23,30 @@ public class ChatListController extends AppCompatActivity {
                 logoutUser();
             }
         });
+
+        class ChatListListener implements ResponseListener {
+            public void getResult(final JSONObject response) {
+                if ((Boolean) response.get("status")) return;
+                Log.d("ChatListController", (String) response.get("description"));
+            }
+        }
+
+        // TODO kill thread when exiting activity
+        new Thread(new Runnable() {
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(5000);
+                        // TODO location is hardcoded
+                        APIManager.getInstance().getChats(new ChatListListener(), 32.987, -96.747);
+
+                    } catch (InterruptedException e) {
+                        Log.d("ChatListController", "Interrupted update loop");
+                        return;
+                    }
+                }
+            }
+        }).start();
     }
 
     public void logoutUser() {

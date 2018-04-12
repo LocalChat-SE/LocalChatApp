@@ -38,11 +38,14 @@ public class APIManager {
 
     private void sendPOST(String endpoint, RequestBody body, final ResponseListener listener) {
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .build();
 
         Request request = new Request.Builder()
                 .url("http://shoemate.net:8888/" + endpoint)
                 .header("Accept-Encoding", "identity")
+                .addHeader("Connection","close")
                 .post(body)
                 .build();
 
@@ -94,7 +97,7 @@ public class APIManager {
         this.sendPOST("new_user", formBody, listener);
     }
 
-    public void getChats(ResponseListener listener, float lat, float lon) {
+    public void getChats(ResponseListener listener, double lat, double lon) {
         RequestBody formBody = new FormBody.Builder()
                 .add("location", "Point(" +
                         String.valueOf(lat) + " " +
