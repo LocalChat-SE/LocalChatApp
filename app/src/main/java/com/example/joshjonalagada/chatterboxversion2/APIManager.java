@@ -16,7 +16,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-// this is implemented where the call an APIManager method is made. getResult is passed the json response.
+// this is implemented where the APIManager method is called. getResult is passed the json response from the server.
 interface ResponseListener {
     void getResult(JSONObject response);
 }
@@ -36,7 +36,7 @@ public class APIManager {
         return instance;
     }
 
-    private void sendPOST(String endpoint, RequestBody body, final ResponseListener listener) {
+    private void sendPOST(final String endpoint, final RequestBody body, final ResponseListener listener) {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .retryOnConnectionFailure(true)
@@ -62,8 +62,7 @@ public class APIManager {
 
             @Override
             public void onFailure(Call call, final IOException exc) {
-                // TODO java.net.ProtocolException: unexpected end of stream
-                // This error occurs randomly, still need to look into. Doesn't seem to be happening now?
+                // TODO debug java.net.ProtocolException: unexpected end of stream
                 Log.e(TAG, String.valueOf(exc));
             }
         });

@@ -11,6 +11,8 @@ import org.json.simple.JSONObject;
 
 public class ChatListController extends AppCompatActivity {
 
+    volatile boolean updateThread = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,15 +28,17 @@ public class ChatListController extends AppCompatActivity {
 
         class ChatListListener implements ResponseListener {
             public void getResult(final JSONObject response) {
+
+                Log.d("ChatListController", response.toString());
                 if ((Boolean) response.get("status")) return;
-                Log.d("ChatListController", (String) response.get("description"));
+
+                Log.d("ChatListController", "unsuccessful");
             }
         }
 
-        // TODO kill thread when exiting activity
-        new Thread(new Runnable() {
+        final Thread updateLoop = new Thread(new Runnable() {
             public void run() {
-                while (true) {
+                while (updateThread) {
                     try {
                         Thread.sleep(5000);
                         // TODO location is hardcoded
@@ -45,8 +49,11 @@ public class ChatListController extends AppCompatActivity {
                         return;
                     }
                 }
+                updateThread = true;
             }
-        }).start();
+        });
+
+        updateLoop.start();
     }
 
     public void logoutUser() {
@@ -57,12 +64,16 @@ public class ChatListController extends AppCompatActivity {
             }
         }
         APIManager.getInstance().logout(new LogoutListener());
+
+        updateThread = false;
         startActivity(new Intent(ChatListController.this, LoginController.class));
     }
 
     public void openChat(Chat c){
         Intent i = new Intent(ChatListController.this, ChatRoomController.class);
         i.putExtra("Chat", c);
+
+        updateThread = false;
         startActivity(i);
     }
 }
