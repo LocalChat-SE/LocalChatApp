@@ -2,11 +2,15 @@ package com.example.joshjonalagada.chatterboxversion2;
 
 import android.util.Log;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Chat implements Serializable {
+    private String chatID;
+
     private String name;
     private String description;
     private double lat;
@@ -14,10 +18,13 @@ public class Chat implements Serializable {
     private double distance;
 
     private Enrolled [] enrollments;
-    private String chatID;
-    private Message [] history;
+    private List<Message> history;
 
     public Chat(JSONObject json) {
+        updateChat(json);
+    }
+
+    private void updateChat(JSONObject json) {
         Log.d("Chat", json.toString());
         if (json.containsKey("name")) name = (String) json.get("name");
         if (json.containsKey("description")) description = (String) json.get("description");
@@ -29,18 +36,21 @@ public class Chat implements Serializable {
         // start time is not actually displayed in the UI, ignore it in the json
         // if (json.containsKey("start_time")) start_time = (String) json.get("start_time");
 
-
-        // TODO: implement user, messages and enrollments constructors
-        if (json.containsKey("users")) {
-            json.get("users");
-        }
-
         if (json.containsKey("messages")) {
-            json.get("messages");
+            JSONArray jsonMessages = (JSONArray) json.get("messages");
+            for (int i = 0; i < jsonMessages.size(); i++) {
+                history.add(new Message((JSONObject) jsonMessages.get(i)));
+            }
         }
 
         if (json.containsKey("enrollments")) {
-            json.get("enrollments");
+            JSONArray jsonEnrollments = (JSONArray) json.get("enrollments");
+
+            enrollments = new Enrolled[jsonEnrollments.size()];
+            // reconstruct chat list
+            for (int i = 0; i < jsonEnrollments.size(); i++) {
+                enrollments[i] = new Enrolled((JSONObject) jsonEnrollments.get(i));
+            }
         }
     }
 
@@ -52,13 +62,9 @@ public class Chat implements Serializable {
 
     public Enrolled[] getEnrollments(){return enrollments;}
     public String getChatID(){return chatID;}
-    public Message[] getHistory(){return history;}
+    public List<Message> getHistory(){return history;}
 
     public void sendMessage(String message){
-
-    }
-
-    void update(){
 
     }
 }

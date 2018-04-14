@@ -1,14 +1,28 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
-/**
- * Created by Tayfun Nalbantoglu on 4/10/2018.
- */
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.simple.JSONObject;
 
 public class Message {
-    User u;
-    String contents;
-    int timestamp;
-    public User getU(){return u;}
-    public String getContents() {return contents;}
+
+    private User user;
+    private String value;
+    private String id;
+    private int timestamp;
+
+    public Message(JSONObject json) {
+        id = (String) json.get("message_id");
+        user = User.get((String) json.get("username"));
+        value = (String) json.get("value");
+
+        // TODO decode this string datetime into seconds
+        timestamp = 0;
+        // timestamp = (int) json.get("time");
+    }
+
+    public User getUser(){return user;}
+    public String getValue() {return value;}
     public int getTimestamp() {return timestamp;}
 }
