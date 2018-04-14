@@ -9,7 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class LoginController extends AppCompatActivity { //this name may need to change to LoginController
 
@@ -46,50 +50,58 @@ public class LoginController extends AppCompatActivity { //this name may need to
     }
 
     public void createUser() {
-        APIManager manager = APIManager.getInstance();
 
-        // callback for processing the response from the API
-        class CreateUserListener implements ResponseListener {
-            public void getResult(final JSONObject response) {
-
-                if ((Boolean) response.get("status")) {
-                    validateUser();
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            credentialsPrompt.setText((String) response.get("description"));
-                        }
-                    });
+        Response.Listener<String> listener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String responseData) {
+                try {
+                    final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
+                    if ((Boolean) response.get("status")) {
+                        validateUser();
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                credentialsPrompt.setText((String) response.get("description"));
+                            }
+                        });
+                    }
+                } catch (ParseException exc) {
+                    Log.e("LoginController", "Could not parse: " + responseData);
                 }
             }
-        }
+        };
 
         String username = usernameField.getText().toString();
         String password = passwordField.getText().toString();
-        manager.setUser(new CreateUserListener(),username, password);
+        APIManager.getInstance().setUser(this, listener, username, password);
     }
 
     public void validateUser() {
-        // callback for processing the response from the API
-        class LoginListener implements ResponseListener {
-            public void getResult(final JSONObject response) {
-                if ((Boolean) response.get("status")) {
-                    openChatList();
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            credentialsPrompt.setText((String) response.get("description"));
-                        }
-                    });
+        Response.Listener<String> listener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String responseData) {
+                try {
+                    final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
+                    if ((Boolean) response.get("status")) {
+                        openChatList();
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                credentialsPrompt.setText((String) response.get("description"));
+                            }
+                        });
+                    }
+                } catch (ParseException exc) {
+                    Log.e("LoginController", "Could not parse: " + responseData);
                 }
             }
-        }
+        };
 
         String username = usernameField.getText().toString();
         String password = passwordField.getText().toString();
-        APIManager.getInstance().getUser(new LoginListener(), username, password);
+        APIManager.getInstance().getUser(this, listener, username, password);
     }
 
     public void openChatList(){

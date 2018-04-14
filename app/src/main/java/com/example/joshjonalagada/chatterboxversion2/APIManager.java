@@ -1,161 +1,149 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-// this is implemented where the APIManager method is called. getResult is passed the json response from the server.
-interface ResponseListener {
-    void getResult(JSONObject response);
-}
+import java.io.UnsupportedEncodingException;
 
 public class APIManager {
 
     private static final String api_key = "SecretKey";
 
-    private static final String TAG = "APIManager";
     private static APIManager instance = null;
 
     private static final String prefixURL = "http://shoemate.net:8888/";
 
     public static synchronized APIManager getInstance() {
-        if (null == instance)
-            instance = new APIManager();
+        if (null == instance) instance = new APIManager();
         return instance;
     }
 
-    private void sendPOST(final String endpoint, final RequestBody body, final ResponseListener listener) {
+    private void sendPOST(Context context, final String endpoint, JSONObject body, final Response.Listener<String> listener) {
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        String URL = prefixURL + endpoint;
+        final String requestBody = body.toString();
 
-        OkHttpClient client = new OkHttpClient.Builder()
-                .retryOnConnectionFailure(true)
-                .build();
-
-        Request request = new Request.Builder()
-                .url("http://shoemate.net:8888/" + endpoint)
-                .header("Accept-Encoding", "identity")
-                .addHeader("Connection","close")
-                .post(body)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, listener,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("APIManager", error.toString());
+                    }
+                }) {
             @Override
-            public void onResponse(Call call, final Response response) throws IOException {
-                final String responseData = response.body().string();
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
                 try {
-                    listener.getResult((JSONObject) new JSONParser().parse(responseData));
-                } catch (ParseException e) {
-                    Log.e(TAG, "Could not parse: " + responseData);
+                    return requestBody == null ? null : requestBody.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                    return null;
                 }
             }
 
-            @Override
-            public void onFailure(Call call, final IOException exc) {
-                // TODO debug java.net.ProtocolException: unexpected end of stream
-                Log.e(TAG, String.valueOf(exc));
-            }
-        });
+//            @Override
+//            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+//                Log.d("APIMANAGER", response.toString());
+//                String responseString = "";
+//                if (response != null) {
+//                    responseString = String.valueOf(response.statusCode);
+//                    // can get more details such as response.headers
+//                }
+//                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+//            }
+        };
+
+        requestQueue.add(stringRequest);
     }
 
-    public void getUser(ResponseListener listener, String userID, String password) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("username", userID)
-                .add("password", password)
-                .add("api_key", api_key)
-                .build();
+    public void getUser(Context context, Response.Listener<String> listener, String userID, String password) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("username", userID);
+        jsonBody.put("password", password);
+        jsonBody.put("api_key", api_key);
 
-        this.sendPOST("login", formBody, listener);
+        this.sendPOST(context, "login", jsonBody, listener);
     }
 
     // right now this just deletes the cookie
-    public void logout(ResponseListener listener) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("api_key", api_key)
-                .build();
-        this.sendPOST("logout", formBody, listener);
+    public void logout(Context context, Response.Listener<String> listener) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("api_key", api_key);
+
+        this.sendPOST(context, "logout", jsonBody, listener);
     }
 
-    public void setUser(ResponseListener listener, String userID, String password) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("username", userID)
-                .add("password", password)
-                .add("api_key", api_key)
-                .build();
+    public void setUser(Context context, Response.Listener<String> listener, String userID, String password) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("username", userID);
+        jsonBody.put("password", password);
+        jsonBody.put("api_key", api_key);
 
-        this.sendPOST("new_user", formBody, listener);
+        this.sendPOST(context, "new_user", jsonBody, listener);
     }
 
-    public void getChats(ResponseListener listener, double lat, double lon) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("location", "Point(" +
-                        String.valueOf(lat) + " " +
-                        String.valueOf(lon) + ")")
-                .add("api_key", api_key)
-                .build();
+    public void getChats(Context context, Response.Listener<String> listener, double lat, double lon) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("location", "Point(" +
+                String.valueOf(lat) + " " +
+                String.valueOf(lon) + ")");
+        jsonBody.put("api_key", api_key);
 
-        this.sendPOST("get_nearby_chats", formBody, listener);
+        this.sendPOST(context, "get_nearby_chats", jsonBody, listener);
     }
 
-    public void getChat(ResponseListener listener, String chatID) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("chatID", chatID)
-                .add("limit", "100")
-                .add("offset", "0")
-                .add("api_key", api_key)
-                .build();
+    public void getChat(Context context, Response.Listener<String> listener, String chatID) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("chat_id", chatID);
+        jsonBody.put("limit", "100");
+        jsonBody.put("offset", "0");
+        jsonBody.put("api_key", api_key);
 
-        this.sendPOST("get_chat", formBody, listener);
+        this.sendPOST(context, "get_chat", jsonBody, listener);
     }
 
-    public void setChat(ResponseListener listener, String chatID) {
+    public void setChat(Context context, Response.Listener<String> listener, String chatID) {
         //TODO not implemented
     }
 
-    public void sendMessage(ResponseListener listener, String chatID, String message) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("chat_id", chatID)
-                .add("value", message)
-                .add("api_key", api_key)
-                .build();
+    public void sendMessage(Context context, Response.Listener<String> listener, String chatID, String message) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("chat_id", chatID);
+        jsonBody.put("value", message);
+        jsonBody.put("api_key", api_key);
 
-        this.sendPOST("new_message", formBody, listener);
+        this.sendPOST(context, "new_message", jsonBody, listener);
     }
 
-    public void setEnrollment(ResponseListener listener, String chatID, String userID, String action) {
-        RequestBody formBody;
+    public void setEnrollment(Context context, Response.Listener<String> listener, String chatID, String userID, String action) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("api_key", api_key);
+        jsonBody.put("chat_id", chatID);
+        jsonBody.put("user_id", userID);
+
+        // TODO
         if (action.equals("moderator")) {
-            formBody = new FormBody.Builder()
-                    .add("chat_id", chatID)
-                    .add("user_id", userID)
-                    .add("api_key", api_key)
-                    .build();
-        }
-        else if (action.equals("ban")) {
-            formBody = new FormBody.Builder()
-                    .add("chat_id", chatID)
-                    .add("user_id", userID)
-                    .add("api_key", api_key)
-                    .build();
-        }
-        else if (action.equals("unban")) {
-            formBody = new FormBody.Builder()
-                    .add("chat_id", chatID)
-                    .add("user_id", userID)
-                    .add("api_key", api_key)
-                    .build();
+        } else if (action.equals("ban")) {
+        } else if (action.equals("unban")) {
         } else return;
 
-        this.sendPOST("set_enrollment", formBody, listener);
+        this.sendPOST(context, "set_enrollment", jsonBody, listener);
     }
 }

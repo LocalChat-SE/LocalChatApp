@@ -7,7 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.android.volley.Response;
+
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class ChatListController extends AppCompatActivity {
 
@@ -26,15 +30,19 @@ public class ChatListController extends AppCompatActivity {
             }
         });
 
-        class ChatListListener implements ResponseListener {
-            public void getResult(final JSONObject response) {
-
-                Log.d("ChatListController", response.toString());
-                if ((Boolean) response.get("status")) return;
-
-                Log.d("ChatListController", "unsuccessful");
+        final Response.Listener<String> listener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String responseData) {
+                try {
+                    final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
+                    Log.d("ChatListController", response.toString());
+                    if ((Boolean) response.get("status")) return;
+                    Log.d("ChatListController", "unsuccessful");
+                } catch (ParseException exc) {
+                    Log.e("ChatListController", "Could not parse: " + responseData);
+                }
             }
-        }
+        };
 
         final Thread updateLoop = new Thread(new Runnable() {
             public void run() {
@@ -42,7 +50,7 @@ public class ChatListController extends AppCompatActivity {
                     try {
                         Thread.sleep(5000);
                         // TODO location is hardcoded
-                        APIManager.getInstance().getChats(new ChatListListener(), 32.987, -96.747);
+                        APIManager.getInstance().getChats(ChatListController.this, listener, 32.987, -96.747);
 
                     } catch (InterruptedException e) {
                         Log.d("ChatListController", "Interrupted update loop");
@@ -57,15 +65,21 @@ public class ChatListController extends AppCompatActivity {
     }
 
     public void logoutUser() {
-        class LogoutListener implements ResponseListener {
-            public void getResult(final JSONObject response) {
-                if ((Boolean) response.get("status")) return;
-                Log.d("ChatListController", "Error logging out. Continuing regardless.");
+        Response.Listener<String> listener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String responseData) {
+                try {
+                    final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
+                    if ((Boolean) response.get("status")) return;
+                    Log.d("ChatListController", "Error logging out. Continuing regardless.");
+                } catch (ParseException exc) {
+                    Log.e("ChatListController", "Could not parse: " + responseData);
+                }
             }
-        }
-        APIManager.getInstance().logout(new LogoutListener());
+        };
 
         updateThread = false;
+        APIManager.getInstance().logout(this, listener);
         startActivity(new Intent(ChatListController.this, LoginController.class));
     }
 
