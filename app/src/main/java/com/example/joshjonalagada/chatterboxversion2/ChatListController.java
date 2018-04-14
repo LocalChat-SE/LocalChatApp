@@ -9,6 +9,8 @@ import android.widget.Button;
 
 import com.android.volley.Response;
 
+import org.json.JSONException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -46,8 +48,13 @@ public class ChatListController extends AppCompatActivity {
                 try {
                     final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
                     Log.d("ChatListController", response.toString());
-                    if ((Boolean) response.get("status")) return;
-                    Log.d("ChatListController", "unsuccessful");
+                    if ((Boolean) response.get("status")) {
+                        updateChats(response);
+                    } else {
+                        Log.d("ChatListController", response.get("description").toString());
+                    }
+                } catch (JSONException exc) {
+                    Log.e("ChatListController", "Invalid json structure: " + responseData);
                 } catch (ParseException exc) {
                     Log.e("ChatListController", "Could not parse: " + responseData);
                 }
@@ -93,7 +100,24 @@ public class ChatListController extends AppCompatActivity {
         startActivity(new Intent(ChatListController.this, LoginController.class));
     }
 
-    public void openChat(Chat c){
+    private void updateChats(JSONObject json) throws JSONException {
+        JSONArray chats = (JSONArray) json.get("data");
+
+        Chat[] chatObjects = new Chat[chats.size()];
+        // reconstruct chat list
+        for (int i = 0; i < chats.size(); i++) {
+            chatObjects[i] = new Chat((JSONObject) chats.get(i));
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // TODO build chat list
+            }
+        });
+    }
+
+    public void openChat(Chat c) {
         Intent i = new Intent(ChatListController.this, ChatRoomController.class);
         i.putExtra("Chat", c);
 

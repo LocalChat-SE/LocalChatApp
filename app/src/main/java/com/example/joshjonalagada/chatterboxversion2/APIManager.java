@@ -21,11 +21,8 @@ import java.net.CookieHandler;
 public class APIManager {
 
     private static final String api_key = "SecretKey";
-
     private static APIManager instance = null;
-
     private static final String prefixURL = "http://shoemate.net:8888/";
-
     private CookieManager manager = new CookieManager();
 
     private APIManager() {
