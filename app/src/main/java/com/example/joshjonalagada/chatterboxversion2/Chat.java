@@ -33,7 +33,7 @@ public class Chat implements Serializable {
 
     public void update(JSONObject json) {
 
-        Log.d("Chat", json.toString());
+        // Log.d("Chat", json.toString());
         if (json.containsKey("name")) name = (String) json.get("name");
         if (json.containsKey("description")) description = (String) json.get("description");
         if (json.containsKey("latitude")) lat = (double) json.get("latitude");

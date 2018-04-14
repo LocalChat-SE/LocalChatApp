@@ -1,11 +1,18 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 
@@ -15,10 +22,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.ArrayList;
+
 public class ChatListController extends AppCompatActivity {
 
     // turn this off to disable polling for groups
     volatile boolean updateThread = true;
+
+    private ArrayList<Chat> allChats = new ArrayList<>();
+    ChatAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,18 @@ public class ChatListController extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 logoutUser();
+            }
+        });
+
+        adapter = new ChatAdapter(this, android.R.layout.simple_list_item_1, allChats);
+        ListView chatListView = findViewById(R.id.chatList);
+        chatListView.setAdapter(adapter);
+
+        chatListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Chat.setCurrentChat((Chat) parent.getItemAtPosition(position));
+                updateThread = false;
+                startActivity(new Intent(ChatListController.this, ChatRoomController.class));
             }
         });
 
@@ -103,26 +127,42 @@ public class ChatListController extends AppCompatActivity {
     private void updateChats(JSONObject json) throws JSONException {
         JSONArray chats = (JSONArray) json.get("data");
 
-        Chat[] chatObjects = new Chat[chats.size()];
+        allChats.clear();
         // reconstruct chat list
         for (int i = 0; i < chats.size(); i++) {
-            chatObjects[i] = new Chat((JSONObject) chats.get(i));
+            allChats.add(new Chat((JSONObject) chats.get(i)));
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO build chat list
-            }
-        });
+        adapter.notifyDataSetChanged();
+    }
+}
+
+
+class ChatAdapter extends ArrayAdapter<Chat> {
+    public ChatAdapter(Context context, int textViewResourceId, ArrayList<Chat> items) {
+        super(context, textViewResourceId, items);
     }
 
-    public void openChat(Chat c) {
-        Chat.setCurrentChat(c);
-        Intent i = new Intent(ChatListController.this, ChatRoomController.class);
-        i.putExtra("Chat", c);
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-        updateThread = false;
-        startActivity(i);
+        // Get the data item for this position
+        final Chat chat = getItem(position);
+        // Check if an existing view is being reused, otherwise inflate the view
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.layout_chat, parent, false);
+        }
+
+        // Lookup view for data population
+        TextView roomName = convertView.findViewById(R.id.roomName);
+        TextView roomDescription = convertView.findViewById(R.id.roomDescription);
+        TextView roomDistance = convertView.findViewById(R.id.roomDistance);
+
+        // Populate the data into the template view using the data object
+        roomName.setText(chat.getName());
+        roomDescription.setText(chat.getDescription());
+        roomDistance.setText(String.valueOf(chat.getDistance()));
+
+        // Return the completed view to render on screen
+        return convertView;
     }
 }
