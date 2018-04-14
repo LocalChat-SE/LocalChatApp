@@ -4,13 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -31,7 +29,7 @@ public class APIManager {
         return instance;
     }
 
-    private void sendPOST(Context context, final String endpoint, JSONObject body, final Response.Listener<String> listener) {
+    private void sendPOST(Context context, final Response.Listener<String> listener, final String endpoint, JSONObject body) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         String URL = prefixURL + endpoint;
         final String requestBody = body.toString();
@@ -57,17 +55,6 @@ public class APIManager {
                     return null;
                 }
             }
-
-//            @Override
-//            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-//                Log.d("APIMANAGER", response.toString());
-//                String responseString = "";
-//                if (response != null) {
-//                    responseString = String.valueOf(response.statusCode);
-//                    // can get more details such as response.headers
-//                }
-//                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-//            }
         };
 
         requestQueue.add(stringRequest);
@@ -79,7 +66,7 @@ public class APIManager {
         jsonBody.put("password", password);
         jsonBody.put("api_key", api_key);
 
-        this.sendPOST(context, "login", jsonBody, listener);
+        this.sendPOST(context, listener, "login", jsonBody);
     }
 
     // right now this just deletes the cookie
@@ -87,7 +74,7 @@ public class APIManager {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("api_key", api_key);
 
-        this.sendPOST(context, "logout", jsonBody, listener);
+        this.sendPOST(context, listener, "logout", jsonBody);
     }
 
     public void setUser(Context context, Response.Listener<String> listener, String userID, String password) {
@@ -96,7 +83,7 @@ public class APIManager {
         jsonBody.put("password", password);
         jsonBody.put("api_key", api_key);
 
-        this.sendPOST(context, "new_user", jsonBody, listener);
+        this.sendPOST(context, listener, "new_user", jsonBody);
     }
 
     public void getChats(Context context, Response.Listener<String> listener, double lat, double lon) {
@@ -106,7 +93,7 @@ public class APIManager {
                 String.valueOf(lon) + ")");
         jsonBody.put("api_key", api_key);
 
-        this.sendPOST(context, "get_nearby_chats", jsonBody, listener);
+        this.sendPOST(context, listener, "get_nearby_chats", jsonBody);
     }
 
     public void getChat(Context context, Response.Listener<String> listener, String chatID) {
@@ -116,11 +103,22 @@ public class APIManager {
         jsonBody.put("offset", "0");
         jsonBody.put("api_key", api_key);
 
-        this.sendPOST(context, "get_chat", jsonBody, listener);
+        this.sendPOST(context, listener,"get_chat", jsonBody);
     }
 
     public void setChat(Context context, Response.Listener<String> listener, String chatID) {
         //TODO not implemented
+    }
+
+    public void newChat(Context context, Response.Listener<String> listener, String name, String description, long lat, long lon) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("name", name);
+        jsonBody.put("description", description);
+        jsonBody.put("location", "Point(" +
+                String.valueOf(lat) + " " +
+                String.valueOf(lon) + ")");
+        jsonBody.put("api_key", api_key);
+        this.sendPOST(context, listener, "new_chat", jsonBody);
     }
 
     public void sendMessage(Context context, Response.Listener<String> listener, String chatID, String message) {
@@ -129,7 +127,7 @@ public class APIManager {
         jsonBody.put("value", message);
         jsonBody.put("api_key", api_key);
 
-        this.sendPOST(context, "new_message", jsonBody, listener);
+        this.sendPOST(context, listener,"new_message", jsonBody);
     }
 
     public void setEnrollment(Context context, Response.Listener<String> listener, String chatID, String userID, String action) {
@@ -144,6 +142,6 @@ public class APIManager {
         } else if (action.equals("unban")) {
         } else return;
 
-        this.sendPOST(context, "set_enrollment", jsonBody, listener);
+        this.sendPOST(context, listener,"set_enrollment", jsonBody);
     }
 }

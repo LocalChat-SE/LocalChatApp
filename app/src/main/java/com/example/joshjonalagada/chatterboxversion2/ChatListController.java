@@ -15,15 +15,25 @@ import org.json.simple.parser.ParseException;
 
 public class ChatListController extends AppCompatActivity {
 
+    // turn this off to disable polling for groups
     volatile boolean updateThread = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_list_gui);
+
+        Button createGroupButton = findViewById(R.id.createButton);
+        createGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateThread = false;
+                startActivity(new Intent(ChatListController.this, CreateGroupController.class));
+            }
+        });
+
         Button logOutButton = findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 logoutUser();
