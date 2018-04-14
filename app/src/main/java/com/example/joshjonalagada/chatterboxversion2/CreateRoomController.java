@@ -15,7 +15,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class CreateGroupController extends AppCompatActivity {
+public class CreateRoomController extends AppCompatActivity {
 
     EditText groupNameField;
     EditText groupDescriptionField;
@@ -26,7 +26,7 @@ public class CreateGroupController extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_group);
+        setContentView(R.layout.activity_create_room);
 
         groupDescriptionField = findViewById(R.id.groupDescriptionField);
         groupNameField = findViewById(R.id.groupNameField);
@@ -41,12 +41,12 @@ public class CreateGroupController extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                createGroup();
+                createRoom();
             }
         });
     }
 
-    public void createGroup() {
+    public void createRoom() {
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
             public void onResponse(String responseData) {
@@ -55,7 +55,9 @@ public class CreateGroupController extends AppCompatActivity {
 
                     // group was created, so switch to the chat room tab
                     if ((Boolean) response.get("status")) {
-                        startActivity(new Intent(CreateGroupController.this, ChatRoomController.class));
+
+                        Chat.setCurrentChat(new Chat((JSONObject) response.get("data")));
+                        startActivity(new Intent(CreateRoomController.this, ChatRoomController.class));
                     } else {
                         // display error prompt returned from server
                         runOnUiThread(new Runnable() {

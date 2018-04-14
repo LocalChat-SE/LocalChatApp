@@ -1,7 +1,6 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
 import android.util.Log;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -20,11 +19,20 @@ public class Chat implements Serializable {
     private Enrolled [] enrollments;
     private List<Message> history;
 
-    public Chat(JSONObject json) {
-        updateChat(json);
+    private static Chat currentChat;
+    public static Chat getCurrentChat() {
+        return currentChat;
+    }
+    public static void setCurrentChat(Chat chat) {
+        currentChat = chat;
     }
 
-    private void updateChat(JSONObject json) {
+    public Chat(JSONObject json) {
+        update(json);
+    }
+
+    public void update(JSONObject json) {
+
         Log.d("Chat", json.toString());
         if (json.containsKey("name")) name = (String) json.get("name");
         if (json.containsKey("description")) description = (String) json.get("description");
@@ -47,7 +55,7 @@ public class Chat implements Serializable {
             JSONArray jsonEnrollments = (JSONArray) json.get("enrollments");
 
             enrollments = new Enrolled[jsonEnrollments.size()];
-            // reconstruct chat list
+            // reconstruct enrollments list
             for (int i = 0; i < jsonEnrollments.size(); i++) {
                 enrollments[i] = new Enrolled((JSONObject) jsonEnrollments.get(i));
             }

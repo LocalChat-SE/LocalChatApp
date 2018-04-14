@@ -23,7 +23,7 @@
         </activity>
         <activity android:name=".ChatListController" />
         <activity android:name=".ChatRoomController" />
-        <activity android:name=".CreateGroupController"></activity>
+        <activity android:name=".CreateRoomController"></activity>
     </application>
 
 </manifest>

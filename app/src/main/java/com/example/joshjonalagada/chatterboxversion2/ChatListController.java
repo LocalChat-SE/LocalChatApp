@@ -30,7 +30,7 @@ public class ChatListController extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 updateThread = false;
-                startActivity(new Intent(ChatListController.this, CreateGroupController.class));
+                startActivity(new Intent(ChatListController.this, CreateRoomController.class));
             }
         });
 
@@ -65,9 +65,9 @@ public class ChatListController extends AppCompatActivity {
             public void run() {
                 while (updateThread) {
                     try {
-                        Thread.sleep(5000);
                         // TODO location is hardcoded
                         APIManager.getInstance().getChats(ChatListController.this, listener, 32.987, -96.747);
+                        Thread.sleep(5000);
 
                     } catch (InterruptedException e) {
                         Log.d("ChatListController", "Interrupted update loop");
@@ -118,6 +118,7 @@ public class ChatListController extends AppCompatActivity {
     }
 
     public void openChat(Chat c) {
+        Chat.setCurrentChat(c);
         Intent i = new Intent(ChatListController.this, ChatRoomController.class);
         i.putExtra("Chat", c);
 
