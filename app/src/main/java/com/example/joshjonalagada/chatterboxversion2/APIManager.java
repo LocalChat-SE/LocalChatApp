@@ -15,6 +15,8 @@ import com.android.volley.toolbox.Volley;
 import org.json.simple.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.net.CookieManager;
+import java.net.CookieHandler;
 
 public class APIManager {
 
@@ -23,6 +25,12 @@ public class APIManager {
     private static APIManager instance = null;
 
     private static final String prefixURL = "http://shoemate.net:8888/";
+
+    private CookieManager manager = new CookieManager();
+
+    private APIManager() {
+        CookieHandler.setDefault(manager);
+    }
 
     public static synchronized APIManager getInstance() {
         if (null == instance) instance = new APIManager();
