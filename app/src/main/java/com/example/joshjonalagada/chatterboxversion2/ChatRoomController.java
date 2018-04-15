@@ -57,7 +57,8 @@ public class ChatRoomController extends AppCompatActivity {
         }
     }
 
-    volatile boolean updateThread = true;
+    volatile boolean doUpdate = true;
+    Thread updateThread;
 
     ListView messageListView;
     Date lastCheck;
@@ -87,7 +88,7 @@ public class ChatRoomController extends AppCompatActivity {
                 Chat currentChat = Chat.getCurrentChat();
                 Enrolled enrollment = currentChat.getEnrollment(user);
 
-                updateThread = false;
+                doUpdate = false;
 
                 Intent i = new Intent(ChatRoomController.this, ModerateUserController.class);
                 i.putExtra("Enrollment", enrollment);
@@ -143,9 +144,9 @@ public class ChatRoomController extends AppCompatActivity {
             }
         };
 
-        final Thread updateLoop = new Thread(new Runnable() {
+        updateThread = new Thread(new Runnable() {
             public void run() {
-                while (updateThread) {
+                while (doUpdate) {
                     try {
                         String dateString;
                         if (lastCheck == null) dateString = "";
@@ -158,11 +159,9 @@ public class ChatRoomController extends AppCompatActivity {
                         return;
                     }
                 }
-                updateThread = true;
+                doUpdate = true;
             }
         });
-
-        updateLoop.start();
     }
 
     private void sendMessage() {
@@ -187,7 +186,14 @@ public class ChatRoomController extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        updateThread = false;
+        doUpdate = false;
         super.onPause();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateThread.start();
     }
 }

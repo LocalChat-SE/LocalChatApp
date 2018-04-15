@@ -57,7 +57,8 @@ public class ChatListController extends AppCompatActivity {
     }
 
     // turn this off to disable polling for groups
-    volatile boolean updateThread = true;
+    volatile boolean doUpdate = true;
+    Thread updateThread;
 
     private ArrayList<Chat> allChats = new ArrayList<>();
     ChatAdapter adapter;
@@ -112,9 +113,9 @@ public class ChatListController extends AppCompatActivity {
             }
         };
 
-        final Thread updateLoop = new Thread(new Runnable() {
+        updateThread = new Thread(new Runnable() {
             public void run() {
-                while (updateThread) {
+                while (doUpdate) {
                     try {
                         // TODO location is hardcoded
                         APIManager.getInstance().getChats(ChatListController.this, listener, 32.987, -96.747);
@@ -125,11 +126,9 @@ public class ChatListController extends AppCompatActivity {
                         return;
                     }
                 }
-                updateThread = true;
+                doUpdate = true;
             }
         });
-
-        updateLoop.start();
     }
 
     public void logoutUser() {
@@ -146,7 +145,7 @@ public class ChatListController extends AppCompatActivity {
             }
         };
 
-        updateThread = false;
+        doUpdate = false;
         APIManager.getInstance().logout(this, listener);
         startActivity(new Intent(ChatListController.this, LoginController.class));
     }
@@ -163,19 +162,27 @@ public class ChatListController extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+
     @Override
     protected void onPause() {
-        updateThread = false;
+        doUpdate = false;
         super.onPause();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateThread.start();
+    }
+
     private void createChat() {
-        updateThread = false;
+        doUpdate = false;
         startActivity(new Intent(ChatListController.this, CreateRoomController.class));
     }
 
     private void openChat() {
-        updateThread = false;
+        doUpdate = false;
         startActivity(new Intent(ChatListController.this, ChatRoomController.class));
     }
 }
