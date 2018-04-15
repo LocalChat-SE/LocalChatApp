@@ -1,12 +1,12 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
 import android.util.Log;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Chat implements Serializable {
     private String chatID;
@@ -71,6 +71,15 @@ public class Chat implements Serializable {
     public String getDescription(){return description;}
     public double getLat(){return lat;}
     public double getLon(){return lon;}
+
+    public Enrolled getEnrollment(User user){
+        for (int i = 0; i < enrollments.length; i++) {
+            Enrolled enrollment = enrollments[i];
+            if (enrollment.getUser().getUsername().equals(user.getUsername())) return enrollment;
+        }
+        return null;
+    }
+
     public double getDistance(){return distance;}
 
     public Enrolled[] getEnrollments(){return enrollments;}

@@ -1,13 +1,16 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private static User loggedUser;
     private static Map<String, User> allUsers = new HashMap<>();
 
-    // TODO: additional descriptive fields, can be handled via API calls
     private String username;
 
     private User(String username) {
@@ -24,7 +27,7 @@ public class User {
     }
 
     // get logged in user
-    public static void setLoggedUser(String username) {loggedUser = new User(username);}
+    public static void setLoggedUser(String username) {loggedUser = get(username);}
     public static User getLoggedUser() {return loggedUser;}
 
     public String getUsername() {return username;}

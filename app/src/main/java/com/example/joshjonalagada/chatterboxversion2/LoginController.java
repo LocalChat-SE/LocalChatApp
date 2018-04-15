@@ -78,11 +78,16 @@ public class LoginController extends AppCompatActivity { //this name may need to
     }
 
     public void validateUser() {
+
+        final String username = usernameField.getText().toString();
+        final String password = passwordField.getText().toString();
+
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
             public void onResponse(String responseData) {
                 try {
                     final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
+                    User.setLoggedUser(username);
                     if ((Boolean) response.get("status")) {
                         openChatList();
                     } else {
@@ -99,8 +104,6 @@ public class LoginController extends AppCompatActivity { //this name may need to
             }
         };
 
-        String username = usernameField.getText().toString();
-        String password = passwordField.getText().toString();
         APIManager.getInstance().getUser(this, listener, username, password);
     }
 

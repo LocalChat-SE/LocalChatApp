@@ -27,6 +27,35 @@ import java.util.ArrayList;
 
 public class ChatListController extends AppCompatActivity {
 
+    class ChatAdapter extends ArrayAdapter<Chat> {
+        public ChatAdapter(Context context, int textViewResourceId, ArrayList<Chat> items) {
+            super(context, textViewResourceId, items);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            // Get the data item for this position
+            final Chat chat = getItem(position);
+            // Check if an existing view is being reused, otherwise inflate the view
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.layout_chat, parent, false);
+            }
+
+            // Lookup view for data population
+            TextView roomName = convertView.findViewById(R.id.roomName);
+            TextView roomDescription = convertView.findViewById(R.id.roomDescription);
+            TextView roomDistance = convertView.findViewById(R.id.roomDistance);
+
+            // Populate the data into the template view using the data object
+            roomName.setText(chat.getName());
+            roomDescription.setText(chat.getDescription());
+            roomDistance.setText(String.valueOf(chat.getDistance()));
+
+            // Return the completed view to render on screen
+            return convertView;
+        }
+    }
+
     // turn this off to disable polling for groups
     volatile boolean updateThread = true;
 
@@ -42,8 +71,7 @@ public class ChatListController extends AppCompatActivity {
         createGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateThread = false;
-                startActivity(new Intent(ChatListController.this, CreateRoomController.class));
+                createChat();
             }
         });
 
@@ -62,8 +90,7 @@ public class ChatListController extends AppCompatActivity {
         chatListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Chat.setCurrentChat((Chat) parent.getItemAtPosition(position));
-                updateThread = false;
-                startActivity(new Intent(ChatListController.this, ChatRoomController.class));
+                openChat();
             }
         });
 
@@ -82,13 +109,6 @@ public class ChatListController extends AppCompatActivity {
                 } catch (ParseException exc) {
                     Log.e("ChatListController", "Could not parse: " + responseData);
                 }
-            }
-        };
-
-        final Response.ErrorListener listenerError = new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("ChatListController", "Chat update failed.");
             }
         };
 
@@ -148,34 +168,14 @@ public class ChatListController extends AppCompatActivity {
         updateThread = false;
         super.onPause();
     }
-}
 
-
-class ChatAdapter extends ArrayAdapter<Chat> {
-    public ChatAdapter(Context context, int textViewResourceId, ArrayList<Chat> items) {
-        super(context, textViewResourceId, items);
+    private void createChat() {
+        updateThread = false;
+        startActivity(new Intent(ChatListController.this, CreateRoomController.class));
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        // Get the data item for this position
-        final Chat chat = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.layout_chat, parent, false);
-        }
-
-        // Lookup view for data population
-        TextView roomName = convertView.findViewById(R.id.roomName);
-        TextView roomDescription = convertView.findViewById(R.id.roomDescription);
-        TextView roomDistance = convertView.findViewById(R.id.roomDistance);
-
-        // Populate the data into the template view using the data object
-        roomName.setText(chat.getName());
-        roomDescription.setText(chat.getDescription());
-        roomDistance.setText(String.valueOf(chat.getDistance()));
-
-        // Return the completed view to render on screen
-        return convertView;
+    private void openChat() {
+        updateThread = false;
+        startActivity(new Intent(ChatListController.this, ChatRoomController.class));
     }
 }

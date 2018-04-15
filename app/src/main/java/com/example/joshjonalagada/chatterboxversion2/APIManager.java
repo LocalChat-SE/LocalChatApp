@@ -131,10 +131,6 @@ public class APIManager {
         this.sendPOST(context, listener,"get_chat", jsonBody);
     }
 
-    public void setChat(Context context, Response.Listener<String> listener, String chatID) {
-        //TODO not implemented
-    }
-
     public void newChat(Context context, Response.Listener<String> listener, String name, String description, long lat, long lon) {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("name", name);
@@ -155,18 +151,20 @@ public class APIManager {
         this.sendPOST(context, listener,"new_message", jsonBody);
     }
 
-    public void setEnrollment(Context context, Response.Listener<String> listener, String chatID, String userID, String action) {
+    public void setModerator(Context context, Response.Listener<String> listener, String chatID, String userID) {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("api_key", api_key);
         jsonBody.put("chat_id", chatID);
         jsonBody.put("user_id", userID);
+        this.sendPOST(context, listener,"set_moderator", jsonBody);
+    }
 
-        // TODO
-        if (action.equals("moderator")) {
-        } else if (action.equals("ban")) {
-        } else if (action.equals("unban")) {
-        } else return;
-
-        this.sendPOST(context, listener,"set_enrollment", jsonBody);
+    public void setBanned(Context context, Response.Listener<String> listener, String chatID, String userID, boolean state) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("api_key", api_key);
+        jsonBody.put("chat_id", chatID);
+        jsonBody.put("user_id", userID);
+        jsonBody.put("banned", state);
+        this.sendPOST(context, listener,"set_banned", jsonBody);
     }
 }

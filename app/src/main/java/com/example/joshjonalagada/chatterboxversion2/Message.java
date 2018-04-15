@@ -3,12 +3,13 @@ import android.util.Log;
 
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Message {
+public class Message implements Serializable {
 
     private User user;
     private String value;
