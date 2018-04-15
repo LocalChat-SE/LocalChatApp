@@ -105,7 +105,7 @@ public class ChatRoomController extends AppCompatActivity {
                         else
                             dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(lastCheck);
                         APIManager.getInstance().getChat(ChatRoomController.this, listener, Chat.getCurrentChat().getChatID(), dateString);
-                        Thread.sleep(5000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         Log.d("ChatRoomController", "Interrupted update loop");
                         return;

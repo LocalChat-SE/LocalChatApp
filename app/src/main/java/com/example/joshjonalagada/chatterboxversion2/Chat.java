@@ -48,7 +48,11 @@ public class Chat implements Serializable {
         if (json.containsKey("messages")) {
             JSONArray jsonMessages = (JSONArray) json.get("messages");
             for (int i = 0; i < jsonMessages.size(); i++) {
-                history.add(new Message((JSONObject) jsonMessages.get(i)));
+                Message newMessage = new Message((JSONObject) jsonMessages.get(i));
+                for (Message msg : history) {
+                    if (msg.getID().equals(newMessage.getID())) return;
+                }
+                history.add(newMessage);
             }
         }
 
@@ -72,8 +76,4 @@ public class Chat implements Serializable {
     public Enrolled[] getEnrollments(){return enrollments;}
     public String getChatID(){return chatID;}
     public ArrayList<Message> getHistory(){return history;}
-
-    public void sendMessage(String message){
-
-    }
 }
