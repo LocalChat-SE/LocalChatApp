@@ -24,7 +24,8 @@
         <activity android:name=".ChatListController" />
         <activity android:name=".ChatRoomController" />
         <activity android:name=".CreateRoomController" />
-        <activity android:name=".ModerateUserController"></activity>
+        <activity android:name=".ModerateUserController" />
+        <activity android:name=".ChatInfoController"></activity>
     </application>
 
 </manifest>

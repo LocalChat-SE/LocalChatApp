@@ -64,6 +64,7 @@ public class ChatRoomController extends AppCompatActivity {
     Date lastCheck;
     EditText messageField;
     Button sendButton;
+    Button metaButton;
 
     MessageAdapter adapter;
 
@@ -106,6 +107,15 @@ public class ChatRoomController extends AppCompatActivity {
             public void onClick(View v) {
                 sendButton.setEnabled(false);
                 sendMessage();
+            }
+        });
+
+        metaButton = findViewById(R.id.metaButton);
+        metaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doUpdate = false;
+                startActivity(new Intent(ChatRoomController.this, ChatInfoController.class));
             }
         });
 

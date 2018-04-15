@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Chat implements Serializable {
     private String chatID;
@@ -17,7 +18,7 @@ public class Chat implements Serializable {
     private double lon;
     private double distance;
 
-    private Enrolled [] enrollments;
+    private ArrayList<Enrolled> enrollments;
     private ArrayList<Message> history = new ArrayList<>();
 
     private static Chat currentChat;
@@ -59,10 +60,10 @@ public class Chat implements Serializable {
         if (json.containsKey("enrollments")) {
             JSONArray jsonEnrollments = (JSONArray) json.get("enrollments");
 
-            enrollments = new Enrolled[jsonEnrollments.size()];
+            enrollments = new ArrayList<>();
             // reconstruct enrollments list
             for (int i = 0; i < jsonEnrollments.size(); i++) {
-                enrollments[i] = new Enrolled((JSONObject) jsonEnrollments.get(i));
+                enrollments.add(new Enrolled((JSONObject) jsonEnrollments.get(i)));
             }
         }
     }
@@ -73,16 +74,15 @@ public class Chat implements Serializable {
     public double getLon(){return lon;}
 
     public Enrolled getEnrollment(User user){
-        for (int i = 0; i < enrollments.length; i++) {
-            Enrolled enrollment = enrollments[i];
+        for (Enrolled enrollment : enrollments) {
             if (enrollment.getUser().getUsername().equals(user.getUsername())) return enrollment;
         }
         return null;
     }
 
+    public String getChatID(){return chatID;}
     public double getDistance(){return distance;}
 
-    public Enrolled[] getEnrollments(){return enrollments;}
-    public String getChatID(){return chatID;}
+    public ArrayList<Enrolled> getEnrollments(){return enrollments;}
     public ArrayList<Message> getHistory(){return history;}
 }

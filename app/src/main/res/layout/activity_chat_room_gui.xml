@@ -5,12 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <Button
+        android:id="@+id/metaButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:text="Meta" />
+
+
     <ListView
         android:id="@+id/messageList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/messageBar"
-
+        android:stackFromBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true">
     </ListView>
@@ -37,5 +46,4 @@
             android:text="Send" />
 
     </LinearLayout>
-
 </RelativeLayout>

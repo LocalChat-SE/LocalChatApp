@@ -167,4 +167,11 @@ public class APIManager {
         jsonBody.put("banned", state);
         this.sendPOST(context, listener,"set_banned", jsonBody);
     }
+
+    public void deleteChat(Context context, Response.Listener<String> listener, String chatID) {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("api_key", api_key);
+        jsonBody.put("chat_id", chatID);
+        this.sendPOST(context, listener,"delete_chat", jsonBody);
+    }
 }
