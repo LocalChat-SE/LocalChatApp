@@ -1,20 +1,24 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Response;
 
-import org.json.JSONException;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -22,13 +26,14 @@ import org.json.simple.parser.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class ChatRoomController extends AppCompatActivity {
     volatile boolean updateThread = true;
 
     Date lastCheck;
+    EditText messageField;
+    Button sendButton;
 
     MessageAdapter adapter;
 
@@ -37,11 +42,37 @@ public class ChatRoomController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room_gui);
 
+        // move the activity up when the keyboard is opened
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         ArrayList<Message> history = Chat.getCurrentChat().getHistory();
         adapter = new MessageAdapter(this, android.R.layout.simple_list_item_1, history);
 
         ListView chatListView = findViewById(R.id.messageList);
         chatListView.setAdapter(adapter);
+
+        // define an action to take when message is sent
+        messageField = findViewById(R.id.messageField);
+
+        // Send the message using a newline (disabled)
+//        messageField.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+//                if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN) {
+//                    sendMessage();
+//                }
+//                return true;
+//            }
+//        });
+
+        sendButton = findViewById(R.id.sendButton);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage();
+            }
+        });
+
 
         final Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
@@ -70,7 +101,8 @@ public class ChatRoomController extends AppCompatActivity {
                     try {
                         String dateString;
                         if (lastCheck == null) dateString = "";
-                        else dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(lastCheck);
+                        else
+                            dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(lastCheck);
 
                         APIManager.getInstance().getChat(ChatRoomController.this, listener, Chat.getCurrentChat().getChatID(), dateString);
                         Thread.sleep(5000);
@@ -84,6 +116,30 @@ public class ChatRoomController extends AppCompatActivity {
         });
 
         updateLoop.start();
+    }
+
+    private void sendMessage() {
+        Response.Listener<String> listener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String responseData) {
+                try {
+                    final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
+                    if ((Boolean) response.get("status")) {
+                        messageField.setText("");
+                    }
+
+                    // message send error, output debug info from server
+                    Log.d("ChatRoomController", String.valueOf(response.get("description")));
+
+                } catch (ParseException exc) {
+                    Log.e("ChatRoomController", "Could not parse: " + responseData);
+                }
+            }
+        };
+
+        String chatID = Chat.getCurrentChat().getChatID();
+        String message = messageField.getText().toString();
+        APIManager.getInstance().sendMessage(this, listener, chatID, message);
     }
 }
 
