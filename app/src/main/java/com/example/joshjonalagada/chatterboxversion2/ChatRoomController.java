@@ -141,6 +141,12 @@ public class ChatRoomController extends AppCompatActivity {
         String message = messageField.getText().toString();
         APIManager.getInstance().sendMessage(this, listener, chatID, message);
     }
+
+    @Override
+    protected void onPause() {
+        updateThread = false;
+        super.onPause();
+    }
 }
 
 

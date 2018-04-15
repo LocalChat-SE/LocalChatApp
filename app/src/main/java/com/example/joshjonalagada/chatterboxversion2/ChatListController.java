@@ -98,7 +98,7 @@ public class ChatListController extends AppCompatActivity {
                     try {
                         // TODO location is hardcoded
                         APIManager.getInstance().getChats(ChatListController.this, listener, 32.987, -96.747);
-                        Thread.sleep(5000);
+                        Thread.sleep(1000);
 
                     } catch (InterruptedException e) {
                         Log.d("ChatListController", "Interrupted update loop");
@@ -141,6 +141,12 @@ public class ChatListController extends AppCompatActivity {
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onPause() {
+        updateThread = false;
+        super.onPause();
     }
 }
 
