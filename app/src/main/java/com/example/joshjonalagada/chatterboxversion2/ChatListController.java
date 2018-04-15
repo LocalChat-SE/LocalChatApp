@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 import org.json.JSONException;
 import org.json.simple.JSONArray;
@@ -71,7 +72,6 @@ public class ChatListController extends AppCompatActivity {
             public void onResponse(String responseData) {
                 try {
                     final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
-                    Log.d("ChatListController", response.toString());
                     if ((Boolean) response.get("status")) {
                         updateChats(response);
                     } else {
@@ -82,6 +82,13 @@ public class ChatListController extends AppCompatActivity {
                 } catch (ParseException exc) {
                     Log.e("ChatListController", "Could not parse: " + responseData);
                 }
+            }
+        };
+
+        final Response.ErrorListener listenerError = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ChatListController", "Chat update failed.");
             }
         };
 

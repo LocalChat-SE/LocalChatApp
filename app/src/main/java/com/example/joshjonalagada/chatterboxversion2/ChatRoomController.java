@@ -1,16 +1,13 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +16,7 @@ import android.widget.TextView;
 
 import com.android.volley.Response;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -31,6 +29,7 @@ import java.util.Locale;
 public class ChatRoomController extends AppCompatActivity {
     volatile boolean updateThread = true;
 
+    ListView chatListView;
     Date lastCheck;
     EditText messageField;
     Button sendButton;
@@ -48,27 +47,16 @@ public class ChatRoomController extends AppCompatActivity {
         ArrayList<Message> history = Chat.getCurrentChat().getHistory();
         adapter = new MessageAdapter(this, android.R.layout.simple_list_item_1, history);
 
-        ListView chatListView = findViewById(R.id.messageList);
+        chatListView = findViewById(R.id.messageList);
         chatListView.setAdapter(adapter);
 
-        // define an action to take when message is sent
         messageField = findViewById(R.id.messageField);
-
-        // Send the message using a newline (disabled)
-//        messageField.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN) {
-//                    sendMessage();
-//                }
-//                return true;
-//            }
-//        });
 
         sendButton = findViewById(R.id.sendButton);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sendButton.setEnabled(false);
                 sendMessage();
             }
         });
@@ -81,10 +69,23 @@ public class ChatRoomController extends AppCompatActivity {
                     final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
                     Log.d("ChatRoomController", response.toString());
                     if ((Boolean) response.get("status")) {
+                        sendButton.setEnabled(true);
+
                         // update the timestamp on success
                         lastCheck = new Date();
                         Chat.getCurrentChat().update((JSONObject) response.get("data"));
+
+                        // if no new messages, then return early
+                        if (((JSONArray) ((JSONObject) response.get("data")).get("messages")).size() == 0) return;
+
+                        // update adapter and autoscroll to the last message
                         adapter.notifyDataSetChanged();
+                        chatListView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                chatListView.setSelection(adapter.getCount() - 1);
+                            }
+                        });
 
                     } else {
                         Log.d("ChatRoomController", response.get("description").toString());
@@ -103,7 +104,6 @@ public class ChatRoomController extends AppCompatActivity {
                         if (lastCheck == null) dateString = "";
                         else
                             dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(lastCheck);
-
                         APIManager.getInstance().getChat(ChatRoomController.this, listener, Chat.getCurrentChat().getChatID(), dateString);
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {

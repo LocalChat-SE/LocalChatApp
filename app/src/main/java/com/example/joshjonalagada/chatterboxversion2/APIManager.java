@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -17,6 +18,8 @@ import org.json.simple.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieManager;
 import java.net.CookieHandler;
+import java.util.HashMap;
+import java.util.Map;
 
 public class APIManager {
 
@@ -34,7 +37,7 @@ public class APIManager {
         return instance;
     }
 
-    private void sendPOST(Context context, final Response.Listener<String> listener, final String endpoint, JSONObject body) {
+    private void sendPOST(final Context context, final Response.Listener<String> listener, final String endpoint, final JSONObject body) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         String URL = prefixURL + endpoint;
         final String requestBody = body.toString();
@@ -43,7 +46,9 @@ public class APIManager {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("APIManager", error.toString());
+                        // re-attempt
+//                        sendPOST(context, listener, endpoint, body);
+//                        error.printStackTrace();
                     }
                 }) {
             @Override
@@ -60,7 +65,21 @@ public class APIManager {
                     return null;
                 }
             }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/x-www-form-urlencoded");
+                return params;
+            }
         };
+
+        // There is an emulator proxy bug that occasionally rejects responses from POST requests
+        // When this occurs, the server gets the first request. Don't retry because it causes duplicates
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
+                0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue.add(stringRequest);
     }
