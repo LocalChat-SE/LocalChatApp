@@ -5,6 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Chat implements Serializable {
@@ -17,7 +18,7 @@ public class Chat implements Serializable {
     private double distance;
 
     private Enrolled [] enrollments;
-    private List<Message> history;
+    private ArrayList<Message> history = new ArrayList<>();
 
     private static Chat currentChat;
     public static Chat getCurrentChat() {
@@ -70,7 +71,7 @@ public class Chat implements Serializable {
 
     public Enrolled[] getEnrollments(){return enrollments;}
     public String getChatID(){return chatID;}
-    public List<Message> getHistory(){return history;}
+    public ArrayList<Message> getHistory(){return history;}
 
     public void sendMessage(String message){
 

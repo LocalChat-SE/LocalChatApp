@@ -101,9 +101,10 @@ public class APIManager {
         this.sendPOST(context, listener, "get_nearby_chats", jsonBody);
     }
 
-    public void getChat(Context context, Response.Listener<String> listener, String chatID) {
+    public void getChat(Context context, Response.Listener<String> listener, String chatID, String time) {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("chat_id", chatID);
+        jsonBody.put("time", time);
         jsonBody.put("limit", "100");
         jsonBody.put("offset", "0");
         jsonBody.put("api_key", api_key);

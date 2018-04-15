@@ -1,8 +1,4 @@
 package com.example.joshjonalagada.chatterboxversion2;
-
-import android.util.Log;
-
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 
 public class Message {
