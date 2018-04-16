@@ -30,6 +30,7 @@ import java.util.Locale;
 
 public class ChatRoomController extends AppCompatActivity {
 
+    // adapter for displaying messages in a ListView within the chat room menu
     class MessageAdapter extends ArrayAdapter<Message> {
         public MessageAdapter(Context context, int textViewResourceId, ArrayList<Message> items) {
             super(context, textViewResourceId, items);
@@ -203,6 +204,7 @@ public class ChatRoomController extends AppCompatActivity {
         APIManager.getInstance().sendMessage(this, listener, chatID, message);
     }
 
+    // run the update thread when the chat room controller is active
     @Override
     protected void onPause() {
         doUpdate = false;

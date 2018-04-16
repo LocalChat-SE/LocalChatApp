@@ -22,7 +22,10 @@ import org.json.simple.parser.ParseException;
 
 import java.util.ArrayList;
 
+
 public class ChatInfoController extends AppCompatActivity {
+
+    // adapter for displaying enrollments in a ListView within the info menu
     class EnrollsAdapter extends ArrayAdapter<Enrolled> {
         public EnrollsAdapter (Context context, int textViewResourceId, ArrayList<Enrolled> items) {
             super(context, textViewResourceId, items);
@@ -86,6 +89,7 @@ public class ChatInfoController extends AppCompatActivity {
         chatMembers.setAdapter(adapter);
 
 
+        // transition to moderate user menu when a chat member is clicked
         chatMembers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User user = ((Enrolled) parent.getItemAtPosition(position)).getUser();

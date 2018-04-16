@@ -1,13 +1,11 @@
 package com.example.joshjonalagada.chatterboxversion2;
 
-import android.util.Log;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class Chat implements Serializable {
     private String chatID;
@@ -46,6 +44,7 @@ public class Chat implements Serializable {
         // start time is not actually displayed in the UI, ignore it in the json
         // if (json.containsKey("start_time")) start_time = (String) json.get("start_time");
 
+        // parse the messages and enrollments
         if (json.containsKey("messages")) {
             JSONArray jsonMessages = (JSONArray) json.get("messages");
             for (int i = 0; i < jsonMessages.size(); i++) {
@@ -73,6 +72,7 @@ public class Chat implements Serializable {
     public double getLat(){return lat;}
     public double getLon(){return lon;}
 
+    // find the enrollment object for a specified user
     public Enrolled getEnrollment(User user){
         for (Enrolled enrollment : enrollments) {
             if (enrollment.getUser().getUsername().equals(user.getUsername())) return enrollment;

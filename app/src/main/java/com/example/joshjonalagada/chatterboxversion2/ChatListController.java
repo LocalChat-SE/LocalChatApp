@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 public class ChatListController extends AppCompatActivity {
 
+    // adapter for displaying chats in a ListView within the chat list menu
     class ChatAdapter extends ArrayAdapter<Chat> {
         public ChatAdapter(Context context, int textViewResourceId, ArrayList<Chat> items) {
             super(context, textViewResourceId, items);
@@ -175,13 +176,12 @@ public class ChatListController extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-
+    // run the update thread when the chat list controller is active
     @Override
     protected void onPause() {
         doUpdate = false;
         super.onPause();
     }
-
 
     @Override
     protected void onResume() {

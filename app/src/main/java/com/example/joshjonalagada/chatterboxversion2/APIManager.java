@@ -46,7 +46,12 @@ public class APIManager {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // re-attempt
+                        // re-attempt disabled.
+                        // Some emulators have a bug where server responses are occasionally ignored.
+                        // From experience, this issue exists both with
+                        //      OkHTTP under ProtocolError: end of stream
+                        //      Volley under Unexpected response 200 (which is a success code)
+
 //                        sendPOST(context, listener, endpoint, body);
 //                        error.printStackTrace();
                     }
@@ -74,8 +79,8 @@ public class APIManager {
             }
         };
 
-        // There is an emulator proxy bug that occasionally rejects responses from POST requests
-        // When this occurs, the server gets the first request. Don't retry because it causes duplicates
+        // Some emulators experience a bug where responses from POST requests are occasionally ignored
+        // When this occurs, the server *does* get the first request. Don't retry because it causes duplicates
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
                 DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
                 0,
@@ -93,7 +98,6 @@ public class APIManager {
         this.sendPOST(context, listener, "login", jsonBody);
     }
 
-    // right now this just deletes the cookie
     public void logout(Context context, Response.Listener<String> listener) {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("api_key", api_key);
@@ -139,6 +143,7 @@ public class APIManager {
                 String.valueOf(lat) + " " +
                 String.valueOf(lon) + ")");
         jsonBody.put("api_key", api_key);
+
         this.sendPOST(context, listener, "new_chat", jsonBody);
     }
 
@@ -156,6 +161,7 @@ public class APIManager {
         jsonBody.put("api_key", api_key);
         jsonBody.put("chat_id", chatID);
         jsonBody.put("username", userID);
+
         this.sendPOST(context, listener,"set_moderator", jsonBody);
     }
 
@@ -165,6 +171,7 @@ public class APIManager {
         jsonBody.put("chat_id", chatID);
         jsonBody.put("username", userID);
         jsonBody.put("banned", state);
+
         this.sendPOST(context, listener,"set_banned", jsonBody);
     }
 
@@ -172,6 +179,7 @@ public class APIManager {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("api_key", api_key);
         jsonBody.put("chat_id", chatID);
+
         this.sendPOST(context, listener,"delete_chat", jsonBody);
     }
 }
