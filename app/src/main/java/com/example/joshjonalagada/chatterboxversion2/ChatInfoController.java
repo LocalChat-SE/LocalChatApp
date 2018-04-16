@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -83,6 +84,22 @@ public class ChatInfoController extends AppCompatActivity {
 
         adapter = new EnrollsAdapter(this, android.R.layout.simple_list_item_1, chatEnrollments);
         chatMembers.setAdapter(adapter);
+
+
+        chatMembers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User user = ((Enrolled) parent.getItemAtPosition(position)).getUser();
+
+                Chat currentChat = Chat.getCurrentChat();
+                Enrolled enrollment = currentChat.getEnrollment(user);
+
+                Intent i = new Intent(ChatInfoController.this, ModerateUserController.class);
+                i.putExtra("Enrollment", enrollment);
+                i.putExtra("User", user);
+                i.putExtra("Chat", currentChat);
+                startActivity(i);
+            }
+        });
     }
 
     private void deleteChat() {

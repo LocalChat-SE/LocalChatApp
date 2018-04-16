@@ -106,6 +106,7 @@ public class ChatRoomController extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendButton.setEnabled(false);
+
                 sendMessage();
             }
         });
@@ -132,7 +133,7 @@ public class ChatRoomController extends AppCompatActivity {
                         startActivity(new Intent(ChatRoomController.this, ChatListController.class));
                         return;
                     }
-                    
+
                     if ((Boolean) response.get("status")) {
                         sendButton.setEnabled(true);
 
@@ -187,6 +188,7 @@ public class ChatRoomController extends AppCompatActivity {
             public void onResponse(String responseData) {
                 try {
                     final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
+                    messageField.setText("");
                     // output debug info from server
                     Log.d("ChatRoomController", String.valueOf(response.get("description")));
 
