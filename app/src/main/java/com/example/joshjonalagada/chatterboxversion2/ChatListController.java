@@ -2,6 +2,7 @@ package com.example.joshjonalagada.chatterboxversion2;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,9 @@ import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 import org.json.simple.JSONArray;
@@ -29,6 +33,8 @@ public class ChatListController extends AppCompatActivity {
 
     // turn this off to disable polling for groups
     volatile boolean updateThread = true;
+    FusedLocationProviderClient mFusedLocationClient;
+    long lat, lon;
 
     private ArrayList<Chat> allChats = new ArrayList<>();
     ChatAdapter adapter;
@@ -37,6 +43,15 @@ public class ChatListController extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_list_gui);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                lat = (long) location.getLatitude();
+                lon = (long) location.getLongitude();
+            }
+        });
 
         Button createGroupButton = findViewById(R.id.createButton);
         createGroupButton.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +112,7 @@ public class ChatListController extends AppCompatActivity {
                 while (updateThread) {
                     try {
                         // TODO location is hardcoded
-                        APIManager.getInstance().getChats(ChatListController.this, listener, 32.987, -96.747);
+                        APIManager.getInstance().getChats(ChatListController.this, listener, lat, lon);
                         Thread.sleep(1000);
 
                     } catch (InterruptedException e) {
