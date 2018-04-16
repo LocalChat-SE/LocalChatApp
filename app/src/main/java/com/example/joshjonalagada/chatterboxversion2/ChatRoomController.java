@@ -126,6 +126,13 @@ public class ChatRoomController extends AppCompatActivity {
                 try {
                     final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
                     Log.d("ChatRoomController", response.toString());
+
+                    if (String.valueOf(response.get("description")).equals("user is banned")) {
+                        Chat.setCurrentChat(null);
+                        startActivity(new Intent(ChatRoomController.this, ChatListController.class));
+                        return;
+                    }
+                    
                     if ((Boolean) response.get("status")) {
                         sendButton.setEnabled(true);
 
@@ -180,7 +187,7 @@ public class ChatRoomController extends AppCompatActivity {
             public void onResponse(String responseData) {
                 try {
                     final JSONObject response = (JSONObject) new JSONParser().parse(responseData);
-                    // message send error, output debug info from server
+                    // output debug info from server
                     Log.d("ChatRoomController", String.valueOf(response.get("description")));
 
                 } catch (ParseException exc) {

@@ -155,7 +155,7 @@ public class APIManager {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("api_key", api_key);
         jsonBody.put("chat_id", chatID);
-        jsonBody.put("user_id", userID);
+        jsonBody.put("username", userID);
         this.sendPOST(context, listener,"set_moderator", jsonBody);
     }
 
@@ -163,7 +163,7 @@ public class APIManager {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("api_key", api_key);
         jsonBody.put("chat_id", chatID);
-        jsonBody.put("user_id", userID);
+        jsonBody.put("username", userID);
         jsonBody.put("banned", state);
         this.sendPOST(context, listener,"set_banned", jsonBody);
     }

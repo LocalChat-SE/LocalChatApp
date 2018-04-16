@@ -16,7 +16,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -105,8 +104,7 @@ public class ChatListController extends AppCompatActivity {
 
         chatListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Chat.setCurrentChat((Chat) parent.getItemAtPosition(position));
-                openChat();
+                openChat((Chat) parent.getItemAtPosition(position));
             }
         });
 
@@ -196,7 +194,8 @@ public class ChatListController extends AppCompatActivity {
         startActivity(new Intent(ChatListController.this, CreateRoomController.class));
     }
 
-    private void openChat() {
+    private void openChat(Chat chat) {
+        Chat.setCurrentChat(chat);
         doUpdate = false;
         startActivity(new Intent(ChatListController.this, ChatRoomController.class));
     }
